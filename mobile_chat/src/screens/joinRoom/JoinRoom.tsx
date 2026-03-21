@@ -19,7 +19,7 @@ const JoinRoom = () => {
         style={{ padding: 10, borderWidth: 1, backgroundColor: '#d1c6c6b6' }}
       />
       <TouchableOpacity
-        onPress={onPressJoinButton}
+        onPress={() => onPressJoinButton(value)}
         style={{
           padding: 10,
           alignSelf: 'center',

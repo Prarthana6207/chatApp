@@ -1,22 +1,39 @@
-import { useNavigation } from '@react-navigation/native';
-import { use, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { fetchPostThunk } from 'redux/FetchSlice/fetchThunk';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setRoomId } from 'redux/storeRoomId/roomIdSlice';
+import { socket } from 'service/socketService';
+
+interface RootState {
+  user: {
+    userId: string;
+  };
+}
+
+type RootStackParamList = {
+  chat: { roomName: string };
+};
 
 export const useViewModal = () => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState<string>('');
+
+  const userId = useSelector((state: RootState) => state.user.userId);
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   const onChangeText = (text: string) => {
-    console.log(text);
     setValue(text);
   };
-  const onPressJoinButton = async () => {
-    // const res = await fetch('http://localhost:3000/posts');
-    // const data = await res.json();
-    // console.log(data, 'resresresres');
-    dispatch(fetchPostThunk());
-    navigation.navigate('chat');
+
+  const onPressJoinButton = async (roomName: string) => {
+    if (!roomName) return;
+
+    socket.emit('joinRoom', roomName, userId);
+    dispatch(setRoomId(roomName));
+
+    navigation.navigate('chat', { roomName });
   };
+
   return { value, onChangeText, onPressJoinButton };
 };

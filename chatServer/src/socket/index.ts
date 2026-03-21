@@ -11,15 +11,35 @@ export const initSocket = (server: HttpServer) => {
   });
   io.on("connection", (socket: Socket) => {
     console.log("A new user has connected", socket.id);
-
+    socket.on("joinRoom", (roomName, userId) => {
+      socket.join(roomName);
+      console.log("userId", userId, "joined room", roomName);
+      socket.to(roomName).emit("userJoined", {
+        userId,
+        socket: socket.id,
+        timeStamp: new Date(),
+        roomName,
+      });
+    });
     // Listen for incoming messages from clients
-    socket.on("message", (message) => {
-      // Broadcast the message to all connected clients
-      io.emit("message", {
+    socket.on("message", (message, roomName) => {
+      // Broadcast the message to everyone else in the room (except sender)
+      socket.broadcast.to(roomName).emit("message", {
         _id: Date.now().toString(),
         text: message.text,
         createdAt: new Date(),
         user: message.user,
+      });
+    });
+
+    socket.on("leaveRoom", (roomName, userId) => {
+      socket.leave(roomName);
+      console.log("userId", userId, "left room", roomName);
+      socket.to(roomName).emit("userLeft", {
+        userId,
+        socket: socket.id,
+        timeStamp: new Date(),
+        roomName,
       });
     });
 
