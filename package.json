@@ -1,0 +1,14 @@
+{
+  "name": "chatapp-monorepo",
+  "private": true,
+  "scripts": {
+    "setup": "bash ./scripts/setup-and-run.sh",
+    "bootstrap": "yarn setup",
+    "start": "yarn setup",
+    "i": "cd mobile_chat && yarn ios",
+    "a": "cd mobile_chat && yarn android",
+    "metro": "cd mobile_chat && yarn start",
+    "backend": "cd chatServer && yarn start",
+    "backend:dev": "cd chatServer && yarn dev"
+  }
+}
